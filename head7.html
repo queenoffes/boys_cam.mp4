@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html class="theme-auto" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Far East Scala</title>
+    <link rel="icon" type="image/x-icon" href="./FarEastScala_files/FES FES.png">
+    <meta name="description" content="illegal C-POP">
+    <meta name="author" content="DJ小男孩">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --avatar-max-width: 90vw;
+            --icon-size: 8vw;
+            --button-gap: 4vw;
+            --section-margin: 5vh;
+            --red-color: #ff2600;
+            --animation-duration: 0.3s;
+        }
+
+        body {
+            background: #8d8d8d;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .background-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("./FarEastScala_files/Head 7 Cover Wide.png");
+            background-size: cover;
+            background-position: center;
+            animation: fadeOut var(--animation-duration) forwards;
+            animation-delay: 0.1s;
+            z-index: -1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 9000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: var(--section-margin);
+            position: relative;
+            z-index: 1;
+        }
+
+        .head7-slider {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            animation: slideText 2s linear infinite;
+        }
+
+        .head7-image {
+            display: inline-block;
+            font-size: 2em;
+            font-weight: bold;
+            color: red;
+            animation: blink 0.2s infinite;
+        }
+
+        @keyframes slideText {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .image-grid {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4vw;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            animation: fadeIn var(--animation-duration) forwards;
+            animation-delay: calc(var(--animation-duration) + 0.1s);
+            padding-bottom: 20vh;
+        }
+
+        .image-grid img {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            object-fit: contain;
+            transform: scale(0.98);
+            transition: all 0.1s ease;
+            will-change: transform;
+            cursor: pointer;
+        }
+
+        .magnifier-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            filter: brightness(0) saturate(100%) blur(0.5px) invert(16%) sepia(99%) saturate(6054%) hue-rotate(358deg) brightness(100%) contrast(112%) drop-shadow(0 0 2px #ff2600);
+            animation: blink 0.2s infinite;
+        }
+
+        .magnifier-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Button styles from index.html */
+        .button-stack {
+            display: flex;
+            justify-content: center;
+            gap: var(--button-gap);
+            flex-wrap: wrap;
+            padding: 0;
+            margin: var(--section-margin) 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding-bottom: 20px;
+            z-index: 100;
+        }
+
+        .button {
+            color: red;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.1s ease;
+            width: var(--icon-size);
+            height: var(--icon-size);
+            min-width: 30px;
+            min-height: 30px;
+        }
+
+        .icon {
+            width: 100%;
+            height: 100%;
+            filter: brightness(0) saturate(100%) blur(0.5px) invert(16%) sepia(99%) saturate(6054%) hue-rotate(358deg) brightness(100%) contrast(112%) drop-shadow(0 0 2px #ff2600);
+            animation: blink 0.01s infinite;
+            object-fit: contain;
+        }
+
+        /* 放大模式 */
+        .magnify-mode {
+            cursor: zoom-in;
+        }
+
+        .magnify-mode .image-grid img {
+            cursor: zoom-in;
+            transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* 放大后的图片样式 */
+        .image-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #8d8d8d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s ease;
+        }
+
+        .image-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .image-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .image-overlay img.zoom {
+            transform: scale(1);
+        }
+
+        /* 非活动图片的样式 */
+        .magnify-mode .image-grid img:not(.active) {
+            opacity: 0.3;
+            filter: grayscale(50%);
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 桌面端样式 */
+        @media (min-width: 768px) {
+            :root {
+                --icon-size: 30px;
+                --button-gap: 140px;
+                --section-margin: 20px;
+            }
+            
+            .button {
+                min-width: 12vw;
+                min-height: 1vw;
+            }
+            
+            .image-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 4vw;
+                padding-bottom: 20vh;
+            }
+        }
+
+        /* 小屏幕手机优化 */
+        @media (max-width: 767px) {
+            :root {
+                --button-gap: 30px;
+                --section-margin: 3vh;
+            }
+            
+            .button-stack {
+                gap: 12.7vw;
+                margin: 5vh 10vw;
+                justify-content: space-around;
+            }
+            
+            .button {
+                min-width: 1vw;
+                min-height: 1vw;
+            }
+            
+            .icon {
+                width: 10vw;
+            }
+            
+            .image-grid {
+                grid-template-columns: 1fr;
+                grid-auto-rows: auto;
+                gap: 10vh;
+                padding-bottom: 30vh;
+            }
+            
+            .image-grid img {
+                max-height: 70vh;
+            }
+            
+            .magnifier-btn {
+                top: 15px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-layer"></div>
+    <div class="container">
+        <img src="./FarEastScala_files/FES FES.png" class="magnifier-btn" id="magnifierBtn" alt="Magnifier">
+        
+        <div class="image-grid">
+            <img src="./FarEastScala_files/头7 COVER fixed.jpg" alt="Cover">
+            <img src="./FarEastScala_files/头七 TL fixed.jpg" alt="TL">
+            <img src="./FarEastScala_files/头7 AD fixed.jpg" alt="AD">
+        </div>
+        
+        <div class="image-overlay" id="imageOverlay">
+            <img src="" alt="Enlarged image">
+        </div>
+    </div>
+	
+    <div class="button-stack" role="navigation">
+        <a class="button button-soundcloud" href="https://soundcloud.com/djgurl/sets/head-7" target="_blank" rel="noopener" role="button">
+            <img class="icon" aria-hidden="true" src="./FarEastScala_files/soundcloud.svg" alt="SoundCloud ">
+        </a>
+        
+        <a class="button button-instagram" href="spotify:album:5w6Uv52qRcGmuvPifNONac" target="_blank" rel="noopener" role="button">
+            <img class="icon" aria-hidden="true" src="./FarEastScala_files/spotify.svg" alt="Spotify">
+        </a>
+        
+        <a class="button button-discord" href="https://djgurl.bandcamp.com/album/7" target="_blank" rel="noopener" role="button">
+            <img class="icon" aria-hidden="true" src="./FarEastScala_files/bandcamp.svg" alt="Bandcamp">
+        </a>
+        
+        <a class="button button-default" href="https://www.gov.cn/" target="_blank" rel="noopener" role="button">
+            <img class="icon" aria-hidden="true" src="./FarEastScala_files/apple-music-alt.svg" alt="Apple Music">
+        </a>
+		
+		<a class="button button-default" href="https://music.163.com/#/artist?id=95949470" target="_blank" rel="noopener" role="button">
+		    <img class="icon" aria-hidden="true" src="./FarEastScala_files/netease-cloud-music-svgrepo-com.svg" alt="网易云音乐">
+		</a>
+    </div>
+
+    <script>
+        // 放大镜功能
+        const magnifierBtn = document.getElementById('magnifierBtn');
+        const imageOverlay = document.getElementById('imageOverlay');
+        const overlayImg = imageOverlay.querySelector('img');
+        let isMagnifyMode = false;
+
+        // 切换放大模式
+        magnifierBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isMagnifyMode = !isMagnifyMode;
+            document.body.classList.toggle('magnify-mode', isMagnifyMode);
+            
+            // 退出放大模式时关闭叠加层
+            if (!isMagnifyMode) {
+                imageOverlay.classList.remove('active');
+                overlayImg.classList.remove('zoom');
+            }
+        });
+
+        // 图片点击交互
+        document.querySelectorAll('.image-grid img').forEach(img => {
+            img.addEventListener('click', function() {
+                if (isMagnifyMode) {
+                    // 设置叠加层图片
+                    overlayImg.src = this.src;
+                    overlayImg.alt = this.alt;
+                    
+                    // 显示叠加层并放大图片
+                    imageOverlay.classList.add('active');
+                    setTimeout(() => {
+                        overlayImg.classList.add('zoom');
+                    }, 10);
+                    
+                    // 标记当前活动的图片
+                    document.querySelectorAll('.image-grid img').forEach(img => {
+                        img.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // 点击叠加层关闭
+        imageOverlay.addEventListener('click', (e) => {
+            if (e.target === imageOverlay || e.target === overlayImg) {
+                imageOverlay.classList.remove('active');
+                overlayImg.classList.remove('zoom');
+                document.querySelectorAll('.image-grid img').forEach(img => {
+                    img.classList.remove('active');
+                });
+            }
+        });
+
+        // 窗口调整时重置状态
+        window.addEventListener('resize', () => {
+            if (isMagnifyMode) {
+                document.body.classList.remove('magnify-mode');
+                isMagnifyMode = false;
+                document.querySelectorAll('.image-grid img').forEach(img => {
+                    img.classList.remove('active');
+                });
+                imageOverlay.classList.remove('active');
+                overlayImg.classList.remove('zoom');
+            }
+        });
+    </script>
+</body>
+</html>
